@@ -45,7 +45,25 @@ class SmsGatewayClass {
         return $result;
 
     }
-    public function composeSmsHealth($visitorInfo, $inMateInfo, $diagnosis, $prescription)
+    public function composeSmsHealth($visitorInfo, $inMateInfo, $violation, $sanction)
+    {
+
+        $message = '';
+
+        $visitorName = $visitorInfo[0]['visitorname'];
+        $inMateName = $inMateInfo[0]['firstname'] . ' ' . $inMateInfo[0]['surname'];
+
+
+
+         $message = 'Hi ' . $visitorName . ', ' . ' inmate ' . $inMateName . ' ' .
+             ' has a violation: ' . $violation . ' and sanction: ' . $sanction;
+
+        return $message;
+
+    }
+
+
+    public function composeSmsViolation($visitorInfo, $inMateInfo, $diagnosis, $prescription)
     {
 
         $message = '';
