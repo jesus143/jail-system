@@ -1,11 +1,15 @@
  <?php
- 
-
-
-
- 
  require 'dbconnect.php';
- 
+ require_once('sms/smsGateway.php');
+ require_once('sms/smsGatewayClass.php');
+ require_once('sms/mysql_crud.php');
+
+
+ use Sms\SmsGatewayClass;
+ use Sms\SmsGateway;
+
+
+
  if (isset($_POST['submit'])){ 
 	
 		 $id = $_GET['inmate_id'];
@@ -13,6 +17,51 @@
 		 $prescription = $_POST['prescription'];
 		 date_default_timezone_set('Asia/Manila');
 		 $dates = date("Y-m-d");
+
+
+
+     /************************
+      * Start sms
+      *****************************/
+
+            // initialized mysql crud database
+            $database = new Database();
+
+            // connect to mysql database
+            $database->connect();
+
+            // get vitor info of the inmate
+            $database->select('visitor', '*', null, 'inmate_id = ' . $id);
+
+            // get result of the visitor info of the inmate
+            $visitorInfo = $database->getResult();
+
+            // get visitor contact info
+            $visitorNumber = $visitorInfo[0]['contact'];
+
+            // set class sms
+            $smsGatewayClass = new SmsGatewayClass($username, $password, $deviceId);
+
+            // get inmate info
+            $database->select('inmate', '*', null, 'inmate_id = ' . $id);
+
+            // get result inmate info
+            $inMateInfo = $database->getResult();
+
+            // compose message for inmate visitor and this is the content of sms to be sent
+            $message = $smsGatewayClass->composeSmsHealth($visitorInfo, $inMateInfo, $diagnosis, $prescription);
+
+            // send sms now
+            $smsGatewayClass->send($message, [$visitorNumber]);
+
+      /************************
+      * End sms
+      *****************************/
+
+
+
+
+
 		 $ins =mysql_query("INSERT INTO healthinfo (inmate_id, diagnosis, prescription, dates) VALUES ('$id', '$diagnosis','$prescription', '$dates') ");
 		if ($ins){
 			?>
