@@ -79,4 +79,20 @@ class SmsGatewayClass {
         return $message;
 
     }
+
+    public function composeSmsCaseHearingSchedule($visitorInfo, $inMateInfo, $hearing, $escort)
+    {
+
+        $message = '';
+
+        $visitorName = $visitorInfo[0]['visitorname'];
+        $inMateName = $inMateInfo[0]['firstname'] . ' ' . $inMateInfo[0]['surname'];
+
+
+         $message =  'inmate ' . $inMateName . ' ' .
+             ' case hearing schedule ' . $hearing . ' and escort ' . $escort;
+
+        return $message;
+
+    }
 }

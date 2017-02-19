@@ -1,16 +1,70 @@
- <?php
- 
+<?php
+require 'dbconnect.php';
+require_once('sms/smsGateway.php');
+require_once('sms/smsGatewayClass.php');
+require_once('sms/mysql_crud.php');
 
 
+use Sms\SmsGatewayClass;
+use Sms\SmsGateway;
 
- 
- require 'dbconnect.php';
- 
- if (isset($_POST['submit'])){ 
+if (isset($_POST['submit'])){
 	
 		 $id = $_GET['inmate_id'];
 		 $hearing = $_POST['hearing'];
 		 $escort = $_POST['escort'];
+
+
+
+	 /************************
+	  * Start sms
+	  *****************************/
+
+	 // initialized mysql crud database
+	 $database = new Database();
+
+	 // connect to mysql database
+	 $database->connect();
+
+	 // get vitor info of the inmate
+	 $database->select('visitor', '*', null, 'inmate_id = ' . $id);
+
+	 // get result of the visitor info of the inmate
+	 $visitorInfo = $database->getResult();
+
+	 // get visitor contact info
+	 $visitorNumber = $visitorInfo[0]['contact'];
+	$visitorName = $visitorInfo[0]['visitorname'];
+
+	 // set class sms
+	 $smsGatewayClass = new SmsGatewayClass($username, $password, $deviceId);
+
+	 // get inmate info
+	 $database->select('inmate', '*', null, 'inmate_id = ' . $id);
+
+	 // get result inmate info
+	 $inMateInfo = $database->getResult();
+     $attorneyName = $inMateInfo[0]['attorney_name'];
+	 $attorneyContact = $inMateInfo[0]['attorney_contact'];
+
+
+	// compose message for inmate visitor and this is the content of sms to be sent
+	 $message = $smsGatewayClass->composeSmsCaseHearingSchedule($visitorInfo, $inMateInfo, $hearing, $escort);
+
+	// send sms to attorney
+	$message1  = 'Hi Atty ' . $attorneyName  .  ' ' . $message;
+	$smsGatewayClass->send( $message1, [$attorneyContact]);
+
+	// send sms now to visitor
+	 $message2  = 'Hi ' . $visitorName  .  ' ' . $message;
+	 $smsGatewayClass->send( $message2, [$visitorNumber]);
+
+ /************************
+  * End sms
+  *****************************/
+
+
+
 		 $ins =mysql_query("INSERT INTO hearing (inmate_id, hearing, escort) VALUES ('$id', '$hearing','$escort') ");
 		if ($ins){
 			?>
