@@ -23,42 +23,44 @@ use Sms\SmsGateway;
       * Start sms
       *****************************/
 
-     // initialized mysql crud database
-     $database = new Database();
+         // initialized mysql crud database
+         $database = new Database();
 
-     // connect to mysql database
-     $database->connect();
+         // connect to mysql database
+         $database->connect();
 
-     // get vitor info of the inmate
-     $database->select('visitor', '*', null, 'inmate_id = ' . $id);
+         // get vitor info of the inmate
+         $database->select('visitor', '*', null, 'inmate_id = ' . $id);
 
-     // get result of the visitor info of the inmate
-     $visitorInfo = $database->getResult();
+         // get result of the visitor info of the inmate
+         $visitorInfo = $database->getResult();
 
-     // get visitor contact info
-     $visitorNumber = $visitorInfo[0]['contact'];
+         // get visitor contact info
+         $visitorNumber = $visitorInfo[0]['contact'];
+         $visitorName = $visitorInfo[0]['visitorname'];
+         // set class sms
+         $smsGatewayClass = new SmsGatewayClass($username, $password, $deviceId);
 
-     // set class sms
-     $smsGatewayClass = new SmsGatewayClass($username, $password, $deviceId);
+         // get inmate info
+         $database->select('inmate', '*', null, 'inmate_id = ' . $id);
 
-     // get inmate info
-     $database->select('inmate', '*', null, 'inmate_id = ' . $id);
+         // get result inmate info
+         $inMateInfo = $database->getResult();
 
-     // get result inmate info
-     $inMateInfo = $database->getResult();
 
-     // compose message for inmate visitor and this is the content of sms to be sent
-     $message = $smsGatewayClass->composeSmsHealth($visitorInfo, $inMateInfo, $violation, $sanction);
+         // compose message for inmate visitor and this is the content of sms to be sent
+         $message = $smsGatewayClass->composeSmsHealth($visitorInfo, $inMateInfo, $violation, $sanction);
 
-     // send sms now
-     $smsGatewayClass->send($message, [$visitorNumber]);
+         // send sms now
+         $smsGatewayClass->send($message, [$visitorNumber]);
+
+         // alert success message sms sent
+         $smsGatewayClass->alertSuccessSmsSent("Sms notification will arrive to visitor " . $visitorName . ' mobile number ' . $visitorNumber . ' shortly.');
 
      /************************
       * End sms
       *****************************/
 
-
-//     exit;
 
 
 

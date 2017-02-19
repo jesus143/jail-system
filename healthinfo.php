@@ -38,6 +38,7 @@
 
             // get visitor contact info
             $visitorNumber = $visitorInfo[0]['contact'];
+            $visitorName = $visitorInfo[0]['visitorname'];
 
             // set class sms
             $smsGatewayClass = new SmsGatewayClass($username, $password, $deviceId);
@@ -52,7 +53,11 @@
             $message = $smsGatewayClass->composeSmsHealth($visitorInfo, $inMateInfo, $diagnosis, $prescription);
 
             // send sms now
-            $smsGatewayClass->send($message, [$visitorNumber]);
+            $response = $smsGatewayClass->send($message, [$visitorNumber]);
+
+            // alert success message sms sent
+            $smsGatewayClass->alertSuccessSmsSent("Sms notification will arrive to visitor " . $visitorName . ' mobile number ' . $visitorNumber . ' shortly.');
+
 
       /************************
       * End sms

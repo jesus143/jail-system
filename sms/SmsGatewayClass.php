@@ -95,4 +95,14 @@ class SmsGatewayClass {
         return $message;
 
     }
+
+    public function alertSuccessSmsSent($message=null) {
+        ?>
+        <script>
+            var message = '<?php print $message;  ?>';
+            alert(message);
+        </script>
+        <?php
+    }
+
 }
